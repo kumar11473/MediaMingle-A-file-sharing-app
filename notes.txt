@@ -1,0 +1,106 @@
+
+     /4dd68075-3aa4-42c7-ada5-a2f832cc3632 
+In React, state updates are asynchronous, meaning that when you call setFile(droppedFile) inside the dropHandler or handleFileChange function, the state update may not immediately reflect in the file state variable when you log it immediately after the setFile call.
+
+Therefore, when you log file immediately after setFile(droppedFile) or setFile(event.target.files[0]), it may still show the previous value of file as React hasn't yet updated the state. However, when you use file to display the image in the <img> tag, React has already rendered the component with the updated file state, hence you see the updated image.
+
+If you want to log the updated value of file, you can use the useEffect hook to observe changes in the file state and log its value there. Here's how you can do it:
+
+javascript
+Copy code
+import { useState, useEffect } from 'react';
+import './index.css';
+import { FaCloudUploadAlt } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
+
+function App() {
+
+  const [file, setFile] = useState();
+  const [filename,setFilename]= useState('Drag and drop your file');
+  const [dropstatus,setDropstatus]=useState(false);
+
+  const dragOverHandler = (event) => {
+    event.preventDefault();
+  }
+
+  const dropHandler = (event) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files[0]; // Get the first file dropped
+    setFile(droppedFile); // Update state with the dropped file
+    setFilename(droppedFile.name);
+    setDropstatus(true);
+  }
+
+  const handleFileChange = (event)=>{
+    event.preventDefault();
+    setFile(event.target.files[0]);
+
+    setFilename(event.target.files[0].name);
+    setDropstatus(true);
+  }
+
+  useEffect(() => {   <---------------------------------- here
+    console.log(file);
+    // now paste setDropstatus , setFilename state here
+  }, [file]); // Log the updated value of 'file' whenever it changes
+
+  return (
+    <div className="bg-gray-600 h-screen flex items-center justify-center">
+      <div className="bg-white rounded-md">
+        <div className='p-10'>
+          <div className=''>
+            <h1 className='text-blue-500 font-[500] text-2xl'>Upload your file</h1>
+          </div>
+          <div className='mt-0'>
+            <p className='text-gray-500 text-sm'>file should be in .jpeg .png .mp4 .pdf format</p>
+          </div>
+          <label className='outline-dotted outline-blue-500 rounded-md my-5 flex flex-col p-4'
+            onDragOver={dragOverHandler}
+            onDrop={dropHandler}
+          >
+            <input 
+              type="file" 
+              accept=".png, .jpeg, .pdf" 
+              onChange={handleFileChange}
+              style={{ display: 'none' }} 
+            />
+            <div className='b flex items-center justify-center mx-2'>
+              {!dropstatus? <FaCloudUploadAlt color='blue' size={40} className='' /> : <FaFileAlt color='blue' size={40} />}
+              
+            </div>
+            <div className=' mx-2 flex items-center justify-center'>
+              <h1>{filename}</h1>
+            </div>
+          </label>
+          <div className=' flex justify-center'>
+            <button className='bg-blue-800 text-white  p-2 font-medium rounded-md'>Upload</button>
+          </div>
+          <div className=' max-h-20 max-w-20'>
+            {file && <img src={URL.createObjectURL(file)} alt="Uploaded file" />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+With this modification, the useEffect hook will log the updated value of file whenever it changes, providing an accurate representation of its value after state updates.
+
+
+
+---------------------------------------------------------------------------------------------------------
+
+ {file && <img src={URL.createObjectURL(file)} alt="Uploaded file" />}
+ URL.createObjectURL(file) is a method that creates a DOMString containing a URL representing the object given as the parameter (in this case, the file object). This method creates a temporary URL that represents the file object locally in the browser.
+
+The purpose of URL.createObjectURL(file) in this context is to generate a URL that can be used as the src attribute for an <img> tag to display the content of the selected file (in this case, an image). It allows you to display the file content directly in the browser without uploading it to a server first.
+
+Using URL.createObjectURL(file) is particularly useful for previewing files such as images, videos, or audio files before uploading them to a server. It creates a URL that points to an object in memory, so it doesn't require additional server requests to fetch the file content, resulting in faster previewing and a better user experience. Additionally, it allows you to avoid uploading files to the server just for previewing purposes, which can save bandwidth and server resources.
+
+It's important to note that the URL created by URL.createObjectURL(file) is only valid for the duration of the page session and should be revoked using URL.revokeObjectURL(url) when it's no longer needed to free up memory resources and prevent memory leaks.
+
+---------------------------------------------------------------------------------------------------------
+
+
+
