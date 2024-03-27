@@ -104,3 +104,22 @@ It's important to note that the URL created by URL.createObjectURL(file) is only
 
 
 
+           // this below code upload file from client to the file system of the server and not the db
+// const storage = multer.diskStorage({   
+//     destination: function (req, file, cb) {
+//       return cb(null, 'public/uploads/')
+//     },
+//     filename: function (req, file, cb) {
+//       const uniqueSuffix = Date.now() ;
+//         // console.log(file);  fieldname:'file', originalname:'your file's actual name',encoding:7bit,mimetype:'application/{pdf/png/image/..}'
+//       const arr = file.originalname.split('.');
+//      const fileFormat = arr[arr.length-1];
+//      console.log(fileFormat);
+//       return cb(null, file.originalname + '-' + uniqueSuffix+'.'+fileFormat)
+//     }
+//   })
+//   const upload = multer({ storage: storage })
+
+
+
+---------------------------------------------------------------------------------------------------------

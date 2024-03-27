@@ -4,11 +4,16 @@ import './index.css';
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { FaFileAlt } from "react-icons/fa";
 
+
+import Modal from './modal';
+
 function App() {
 
   const [file, setFile] = useState(null);
   const [filename,setFilename]= useState('Drag and drop your file');
   const [dropstatus,setDropstatus]=useState(false);
+  const [modal,setModal]=useState(false);
+  const [dataLink,setDataLink]=useState('');
 
   const dragOverHandler = (event) => {
     event.preventDefault();
@@ -36,7 +41,11 @@ function App() {
       // console.log(data.get('file')); // okay
       const response = await axios.post('http://localhost:5000/',data);
       console.log(response);
-
+      if(response.status==201){
+        // setModal(true);
+        const donwload_url=`http://localhost:5000/file/${response.data.file.id}`
+        alert(`Donwload URL : ${donwload_url}`);
+      }
     }
   } 
 
@@ -50,9 +59,17 @@ function App() {
   }, [file]); // Log the updated value of 'file' whenever it changes
 
 
+
+  const modalObject={
+    link:dataLink,
+    status:modal,
+    
+  };
+
+
   return (
     <div className="bg-gray-600 h-screen flex items-center justify-center">
-      <div className="bg-white rounded-md">
+      <div className={ (modal===false)? 'bg-white rounded-md' : 'hidden'}>
         <div className='p-10'>
           <div className=''>
             <h1 className='text-blue-500 font-[500] text-2xl'>Upload your file</h1>
@@ -82,12 +99,15 @@ function App() {
           <div className=' flex justify-center'>
             <button className='bg-blue-800 text-white  p-2 font-medium rounded-md' onClick={uploadHandler} >Upload</button>
           </div>
-          <div className=' max-h-20 max-w-20'>
 
-          {file && <img src={URL.createObjectURL(file)} alt="Uploaded file" />}  
-          </div>
+          {/* <div className=' max-h-20 max-w-20'>
+
+          {file && <img src={URL.createObjectURL(file)} alt="Uploaded file" />}   // see notes
+          </div> */}
+         
         </div>
       </div>
+      
     </div>
   );
 }
